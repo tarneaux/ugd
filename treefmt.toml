@@ -1,0 +1,11 @@
+on-unmatched = "debug"
+
+[formatter.nix]
+command = "nixfmt"
+options = []
+includes = [ "*.nix" ]
+
+[formatter.python]
+command = "ruff"
+options = [ "format" ]
+includes = [ "*.py" ]
