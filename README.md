@@ -1,7 +1,12 @@
 To get started, run the following:
 
+```sh
+nix develop
+poetry run python -m ug
 ```
-$ nix develop
-$ poetry run python -m sample_package
-Hello, world!
+
+For LSP to work correctly:
+
+```sh
+eval $(poetry env activate)
 ```

@@ -11,6 +11,13 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.10"
+# beautifulsoup4 = "^4.13"
+# requests = "^2.32"
+beautifulsoup4 = "^4.13.4"
+requests = "^2.32.4"
+
+[tool.poetry.scripts]
+ugd = 'ugd.__main__:main'
 
 [build-system]
 requires = ["poetry-core"]
