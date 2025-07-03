@@ -10,7 +10,6 @@ def main():
     opts, urls = parse_args()
     print("Downloading...")
 
-
     for url in urls:
         try:
             song = get_song(url)
@@ -23,27 +22,36 @@ def main():
             os.mkdir(dir)
         open(path, "w").write(song_to_text(song))
 
+
 def get_song(url: str) -> ug.SongDetail:
     url = url.removeprefix("https://tabs.ultimate-guitar.com/tab/")
     if url.startswith("https://"):
         raise ValueError("I don't know about this domain.")
     return ug.get_song(url)
 
+
 def get_song_path(song: ug.SongDetail, download_dir: str):
-    return os.path.join(download_dir,
-                        sanitize_fn(song.artist_name),
-                        sanitize_fn(song.song_name)+".txt")
+    return os.path.join(
+        download_dir,
+        sanitize_fn(song.artist_name),
+        sanitize_fn(song.song_name) + ".txt",
+    )
+
 
 def sanitize_fn(fn: str) -> str:
-    return re.sub(r'[^\w_. -]', '_', fn)
+    return re.sub(r"[^\w_. -]", "_", fn)
+
 
 def parse_args():
     parser = OptionParser(usage="%prog [-d <download-dir>] <-f <filename>|<URL>>")
-    
-    parser.add_option('-f', '--file', help='Read URLs from file')
-    parser.add_option('-d', '--download-dir',
-                      help="Download directory",
-                      default=os.path.expanduser("~/ug-tabs"))
+
+    parser.add_option("-f", "--file", help="Read URLs from file")
+    parser.add_option(
+        "-d",
+        "--download-dir",
+        help="Download directory",
+        default=os.path.expanduser("~/ug-tabs"),
+    )
 
     opts, args = parser.parse_args()
 
@@ -63,6 +71,7 @@ def parse_args():
         sys.exit(1)
 
     return opts, urls
+
 
 @dataclass
 class Opts:

@@ -63,7 +63,7 @@ class SongDetail:
 
     def __init__(self, data: dict):
         self.tab = data["store"]["page"]["data"]["tab_view"]["wiki_tab"]["content"]
-        self.artist_name = data["store"]["page"]["data"]["tab"]['artist_name']
+        self.artist_name = data["store"]["page"]["data"]["tab"]["artist_name"]
         self.song_name = data["store"]["page"]["data"]["tab"]["song_name"]
         self.version = int(data["store"]["page"]["data"]["tab"]["version"])
         self._type = data["store"]["page"]["data"]["tab"]["type"]
@@ -98,17 +98,21 @@ class SongDetail:
         # (?P<quality>[^[/]+)?  : Chord quality is anything after the root, but before the `/` for the base note
         # (?P<bass>/[A-Ha-h](#|b)?)? :  Chord quality is anything after the root, including parens in the case of 'm(maj7)'
         # tab = re.sub(r'\[ch\](?P<root>[A-Ga-g](#|b)?)(?P<quality>[#\w()]+)?(?P<bass>/[A-Ga-g](#|b)?)?\[\/ch\]', self.parse_chord, tab)
-        tab = re.sub(r'\[ch\](?P<root>[A-Ha-h](#|b)?)(?P<quality>[^[/]+)?(?P<bass>/[A-Ha-h](#|b)?)?\[\/ch\]', self.parse_chord, tab)
+        tab = re.sub(
+            r"\[ch\](?P<root>[A-Ha-h](#|b)?)(?P<quality>[^[/]+)?(?P<bass>/[A-Ha-h](#|b)?)?\[\/ch\]",
+            self.parse_chord,
+            tab,
+        )
         self.tab = tab
 
     def parse_chord(self, chord):
-        root = '<span class="chord-root">%s</span>' % chord.group('root')
-        quality = ''
-        bass = ''
-        if chord.group('quality') is not None:
-            quality = '<span class="chord-quality">%s</span>' % chord.group('quality')
-        if chord.group('bass') is not None:
-            bass = '/<span class="chord-bass">%s</span>' % chord.group('bass')[1:]
+        root = '<span class="chord-root">%s</span>' % chord.group("root")
+        quality = ""
+        bass = ""
+        if chord.group("quality") is not None:
+            quality = '<span class="chord-quality">%s</span>' % chord.group("quality")
+        if chord.group("bass") is not None:
+            bass = '/<span class="chord-bass">%s</span>' % chord.group("bass")[1:]
         return '<span class="chord fw-bold">%s</span>' % (root + quality + bass)
 
 
@@ -120,16 +124,18 @@ class Search:
 
     def __init__(self, value: str, page: int):
         try:
-            resp = requests.get(f"https://www.ultimate-guitar.com/search.php?page={page}&search_type=title&value={quote(value)}",
-                                headers={'User-Agent': USER_AGENT})
+            resp = requests.get(
+                f"https://www.ultimate-guitar.com/search.php?page={page}&search_type=title&value={quote(value)}",
+                headers={"User-Agent": USER_AGENT},
+            )
             resp.raise_for_status()
-            bs = BeautifulSoup(resp.text, 'html.parser') # data can be None
-            data = bs.find("div", {"class": "js-store"}) # KeyError
-            data = json.loads(data.attrs['data-content'])
+            bs = BeautifulSoup(resp.text, "html.parser")  # data can be None
+            data = bs.find("div", {"class": "js-store"})  # KeyError
+            data = json.loads(data.attrs["data-content"])
             self.results = self.get_results(data)
-            self.total_pages = data['store']['page']['data']['pagination']['total']
-            self.current_page = data['store']['page']['data']['pagination']['current']
-            #print(json.dumps(data, indent=4))
+            self.total_pages = data["store"]["page"]["data"]["pagination"]["total"]
+            self.current_page = data["store"]["page"]["data"]["pagination"]["current"]
+            # print(json.dumps(data, indent=4))
         except requests.exceptions.RequestException:
             # don't print full URL here, in case of 404
             raise ValueError(f"Could not find any chords for '{value}'.")
@@ -137,7 +143,7 @@ class Search:
             raise ValueError(f"Could not search for chords: {e}") from e
 
     def get_results(self, data: object):
-        results = data['store']['page']['data']['results']
+        results = data["store"]["page"]["data"]["results"]
         ug_results = []
         for result in results:
             _type = result.get("type")
@@ -159,11 +165,10 @@ def get_chords(s: SongDetail) -> SongDetail:
             frets = chord_variant["frets"]
             min_fret = min(frets)
             max_fret = max(frets)
-            possible_frets = list(range(min_fret, max_fret+1))
+            possible_frets = list(range(min_fret, max_fret + 1))
             variants_temp = {
                 possible_fret: [1 if b == possible_fret else 0 for b in frets][::-1]
-                for possible_fret
-                in possible_frets
+                for possible_fret in possible_frets
                 if possible_fret > 0
             }
 
@@ -204,15 +209,22 @@ def get_chords(s: SongDetail) -> SongDetail:
 
 def get_song(url_path: str):
     try:
-        resp = requests.get("https://tabs.ultimate-guitar.com/tab/" + url_path,
-                            headers={'User-Agent': USER_AGENT})
+        resp = requests.get(
+            "https://tabs.ultimate-guitar.com/tab/" + url_path,
+            headers={"User-Agent": USER_AGENT},
+        )
         resp.raise_for_status()
-        bs = BeautifulSoup(resp.text, 'html.parser')
+        bs = BeautifulSoup(resp.text, "html.parser")
         data = bs.find("div", {"class": "js-store"})
-        data = data.attrs['data-content']
+        data = data.attrs["data-content"]
         data = json.loads(data)
         s = SongDetail(data)
         s.chords, s.fingers_for_strings = get_chords(s)
         return s
-    except (KeyError, ValueError, AttributeError, requests.exceptions.RequestException) as e:
+    except (
+        KeyError,
+        ValueError,
+        AttributeError,
+        requests.exceptions.RequestException,
+    ) as e:
         raise ValueError(f"Could not parse chord: {e}") from e
