@@ -26,7 +26,7 @@ def main():
 def get_song(url: str) -> ug.SongDetail:
     url = url.removeprefix("https://tabs.ultimate-guitar.com/tab/")
     if url.startswith("https://"):
-        raise ValueError("I don't know about this domain.")
+        raise ValueError("This is not a UG tab url.")
     return ug.get_song(url)
 
 
