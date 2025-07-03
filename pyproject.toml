@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "ugd"
+version = "0.1.0"
+description = ""
+authors = ["Tarneo <tarneo@tarneo.fr>"]
+readme = "README.md"
+license = "GPLv3"
+packages = [
+  { include = "ugd" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
