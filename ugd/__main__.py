@@ -92,6 +92,8 @@ def song_to_text(song: ug.SongDetail):
     soup = BeautifulSoup(html, "html.parser")
     main_text += soup.get_text().replace(NEWLINE_STR, "\n")
 
+    return main_text
+
 
 if __name__ == "__main__":
     main()
