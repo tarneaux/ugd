@@ -21,6 +21,7 @@ def main():
         if not os.path.isdir(dir):
             os.mkdir(dir)
         open(path, "w").write(song_to_text(song))
+        append_log(url, opts.download_dir)
 
 
 def get_song(url: str) -> ug.SongDetail:
