@@ -51,18 +51,24 @@ class SearchResult:
 
 @dataclass
 class SongDetail:
+    data = dict
     tab: str
     artist_name: str
     song_name: str
     version: int
     difficulty: str
-    capo: str
     tuning: str
     tab_url: str
+    tab_id: int
+    tab_part: str
+    capo: str | None = None
     alternatives: list[SearchResult] = field(default_factory=list)
 
     def __init__(self, data: dict):
+        self.data = data
         self.tab = data["store"]["page"]["data"]["tab_view"]["wiki_tab"]["content"]
+        self.tab_id = data["store"]["page"]["data"]["tab"]["id"]
+        self.tab_part = data["store"]["page"]["data"]["tab"]["part"]
         self.artist_name = data["store"]["page"]["data"]["tab"]["artist_name"]
         self.song_name = data["store"]["page"]["data"]["tab"]["song_name"]
         self.version = int(data["store"]["page"]["data"]["tab"]["version"])

@@ -34,9 +34,11 @@ def get_song_path(song: ug.SongDetail, download_dir: str):
     return os.path.join(
         download_dir,
         sanitize_fn(song.artist_name),
-        sanitize_fn(song.song_name) + ".txt",
+        f"{sanitize_fn(song.song_name)}_{song.tab_part}_{song.tab_id}.txt",
     )
 
+def append_log(url: str, download_dir: str):
+    open(os.path.join(download_dir, "history.txt"), "a").write(url + "\n")
 
 def sanitize_fn(fn: str) -> str:
     return re.sub(r"[^\w_. -]", "_", fn)
@@ -79,10 +81,15 @@ class Opts:
 
 
 def song_to_text(song: ug.SongDetail):
+    main_text = ""
+
+    if song.capo is not None:
+        main_text += f"Capo {song.capo}\n\n"
+
     NEWLINE_STR = "**/**NEWLINE**/**"
     html = song.tab.replace("<br/>", NEWLINE_STR)
     soup = BeautifulSoup(html, "html.parser")
-    return soup.get_text().replace(NEWLINE_STR, "\n")
+    main_text += soup.get_text().replace(NEWLINE_STR, "\n")
 
 
 if __name__ == "__main__":
