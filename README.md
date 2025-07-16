@@ -1,12 +1,9 @@
-To get started, run the following:
-
+Example:
 ```sh
-nix develop
-poetry run python -m ug
+nix run . -- https://tabs.ultimate-guitar.com/tab/jeff-buckley/hallelujah-chords-198052
 ```
 
 For LSP to work correctly:
-
 ```sh
 eval $(poetry env activate)
 ```
